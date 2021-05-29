@@ -43,12 +43,34 @@ module.exports = {
     }
   },
   show: async (req, res) => {
-    res.json({ message: "Mostrar 1 dado" });
+    try {
+      const { id } = req.params;
+      const conn = await mysql.createConnection(configDB);
+      const result = await conn.execute("SELECT * FROM niveis WHERE id = ?", [
+        id,
+      ]);
+      if (!result[0].affectedRows) throw { message: "Erro ao buscar id" };
+      return res
+        .status(200)
+        .json({ message: "Mostrar 1 dados", niveis: rows[0] });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
   },
   update: async (req, res) => {
     res.json({ message: "Atualizar 1 dado" });
   },
   delete: async (req, res) => {
-    res.json({ message: "Apagar 1 dado" });
+    try {
+      const { id } = req.params;
+      const conn = await mysql.createConnection(configDB);
+      const result = await conn.execute("DELETE FROM niveis WHERE id = ?", [
+        id,
+      ]);
+      if (!result[0].affectedRows) throw { message: "Erro ao deletar dado" };
+      return res.status(200).json({ message: "Deletado com sucesso" });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
   },
 };
