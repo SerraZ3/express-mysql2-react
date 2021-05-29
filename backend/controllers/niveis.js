@@ -30,7 +30,17 @@ module.exports = {
     }
   },
   index: async (req, res) => {
-    res.json({ message: "Listar dados" });
+    try {
+      const { name, order, orderBy = "titulo" } = req.query;
+      const conn = await mysql.createConnection(configDB);
+      var query = "SELECT * FROM niveis ";
+      if (name) query += "WHERE titulo LIKE ? ";
+      if (order) query += `ORDER BY ${orderBy} ${order}`;
+      const [rows] = await conn.execute(query, [`%${name}%`]);
+      return res.status(200).json({ message: "Mostrar dados", niveis: rows });
+    } catch (error) {
+      return res.status(400).json({ error });
+    }
   },
   show: async (req, res) => {
     res.json({ message: "Mostrar 1 dado" });
